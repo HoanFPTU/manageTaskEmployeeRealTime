@@ -15,6 +15,38 @@ const employeeController = {
       res.status(500).json({ message: error.message });
     }
   },
+  LoginEmployee: async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      if (!username || !password) {
+        return res.status(400).json({ message: "Missing data" });
+      }
+      const employeeId = await employeeServices.LoginEmployee(
+        username,
+        password
+      );
+      return res.status(201).json({
+        employeeId,
+        success: true,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+  ActiveAccount: async (req, res) => {
+    try {
+      const { employeeId, username, password } = req.body;
+      if (!employeeId || !username || !password) {
+        return res.status(400).json({ message: "Missing data" });
+      }
+      await employeeServices.ActiveAccount(employeeId, username, password);
+      return res.status(201).json({
+        success: true,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
   ValidateAccessCode: async (req, res) => {
     try {
       const { accessCode, email } = req.body;

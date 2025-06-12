@@ -13,11 +13,76 @@ const employeeServices = {
     if (!employee.exists()) {
       throw new Error("Email does not exist");
     }
+    if (!employee.val()?.active) {
+      throw new Error(
+        "Account is not active, Please check your email or contact to your manager"
+      );
+    }
     const accessCode = Math.floor(100000 + Math.random() * 900000);
     sendMail(email, "Login Access Code", `Your access code is: ${accessCode}`);
     const employeeId = Object.keys(employee.val())[0];
     return await db.ref(`employees/${employeeId}`).update({
       accessCode: accessCode,
+    });
+  },
+  LoginEmployee: async (username, password) => {
+    if (!username || !password) {
+      throw new Error("Missing Username or Password");
+    }
+    const employeeSnapshot = await db
+      .ref("employees")
+      .orderByChild("username")
+      .equalTo(username)
+      .once("value");
+
+    if (!employeeSnapshot.exists()) {
+      throw new Error("Username does not exist");
+    }
+    const employeeData = employeeSnapshot.val();
+    const employeeId = Object.keys(employeeData)[0];
+    const employee = employeeData[employeeId];
+    if (!employee.active) {
+      throw new Error(
+        "Account is not active. Please check your email or contact your manager."
+      );
+    }
+
+    if (employee.password !== password) {
+      throw new Error("Invalid password");
+    }
+
+    // ✅ Trả về ID nếu đăng nhập thành công
+    return employeeId;
+  },
+  ActiveAccount: async (employeeId, username, password) => {
+    if (!employeeId || !username || !password) {
+      throw new Error("Missing data");
+    }
+    const employeeCheck = await db
+      .ref("employees")
+      .orderByChild("username")
+      .equalTo(username)
+      .once("value");
+    console.log(employeeCheck);
+    if (employeeCheck.exists()) {
+      throw new Error("Username already exists");
+    }
+
+    const userSnapshot = await db.ref(`employees/${employeeId}`).once("value");
+    const employee = userSnapshot.val();
+    if (!employee) {
+      throw new Error("Employee does not exist");
+    }
+    if (employee.active) {
+      throw new Error(
+        "Account is already active, Please login to your account"
+      );
+    }
+
+    return await db.ref(`employees/${employeeId}`).update({
+      username,
+      password,
+      active: true,
     });
   },
   ValidateAccessCode: async (email, accessCode) => {

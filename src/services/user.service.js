@@ -1,4 +1,5 @@
 const { db } = require("../config/firebase");
+const { sendMail, sendMailHTML } = require("../config/mailSever");
 const { sendSMS } = require("../config/sendSMS");
 
 const userService = {
@@ -35,11 +36,29 @@ const userService = {
     if (!name || !email || !department) {
       return res.status(400).json({ message: "Missing data" });
     }
+    const employee = await db
+      .ref("employees")
+      .orderByChild("email")
+      .equalTo(email)
+      .once("value");
+
+    if (employee.exists()) {
+      throw new Error("Email already exists");
+    }
     const id = await db.ref("employees/").push({
       name,
       email,
       department,
     });
+    sendMailHTML(
+      email,
+      "Welcome to Manage Task App",
+      `
+    <p>Hi, ${name}</p>
+    <p>Welcome to Manage Task App, your account just be created</p>
+    <p>To active account please click this link <a href="${`http://localhost:5173/activeAccount?id=${id.key}`}>Click here</a></p>
+  `
+    );
 
     return id.key;
   },

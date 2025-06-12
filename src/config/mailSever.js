@@ -20,3 +20,15 @@ export const sendMail = async (emailTo, subject, text) => {
     console.error("❌ Error sending email:", error);
   }
 };
+export const sendMailHTML = async (emailTo, subject, HTML) => {
+  try {
+    const info = await transporter.sendMail({
+      from: "mailsendapptesthoan@gmail.com", // Tên người gửi
+      to: emailTo,
+      subject: subject,
+      html: HTML,
+    });
+  } catch (error) {
+    console.error("❌ Error sending email:", error);
+  }
+};
