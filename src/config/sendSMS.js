@@ -1,7 +1,9 @@
 import twilio from "twilio";
+import dotenv from "dotenv";
+dotenv.config();
 
-const accountSid = "AC3d1645de9de68e7ce8fa179a98f0c0dd";
-const authToken = "00afc2960f038269bd023eeca68b6c63";
+const accountSid = process.env.TWILIO_SID;
+const authToken = process.env.TWILIO_TOKEN;
 const client = new twilio(accountSid, authToken);
 export const sendSMS = async (to, body) => {
   try {
