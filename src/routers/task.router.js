@@ -8,5 +8,6 @@ taskRouter.post("/editTaskById", taskController.EditTaskById);
 taskRouter.post("/getTaskById", taskController.GetTaskById);
 taskRouter.post("/getAllTasks", taskController.GetAllTasks);
 taskRouter.post("/deleteTaskById", taskController.DeleteTaskById);
-
+taskRouter.post("/doneTaskById", taskController.DoneTaskById);
+taskRouter.post("/getTaskByUserId", taskController.GetTaskByUserId);
 module.exports = taskRouter;

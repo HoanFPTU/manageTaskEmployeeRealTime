@@ -4,12 +4,13 @@ const employeeRouter = require("./src/routers/employee.router");
 const app = express();
 const cors = require("cors");
 const taskRouter = require("./src/routers/task.router");
+const { sendMail } = require("./src/config/mailSever");
+const { sendSMS } = require("./src/config/sendSMS");
 const corsOptions = {
   origin: "http://localhost:5173",
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
-
 const port = 3000;
 app.use(express.json());
 app.use(userRouter);

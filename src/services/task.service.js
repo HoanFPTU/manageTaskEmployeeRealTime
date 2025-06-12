@@ -29,6 +29,20 @@ const taskService = {
       employees,
     });
   },
+  DoneTaskById: async (taskId) => {
+    if (!taskId) {
+      throw new Error("Missing data");
+    }
+    const userSnapshot = await db.ref(`tasks/${taskId}`).once("value");
+    const task = userSnapshot.val();
+
+    if (!task) {
+      throw new Error("taskId does not exists");
+    }
+    return await db.ref(`tasks/${taskId}`).update({
+      done: true,
+    });
+  },
   GetTaskById: async (taskId) => {
     console.log(taskId);
     if (!taskId) {
@@ -42,6 +56,23 @@ const taskService = {
     }
 
     return task;
+  },
+  GetTaskByUserId: async (employeeId) => {
+    const snapshot = await db.ref("tasks").once("value");
+
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const tasks = Object.entries(data).map(([id, value]) => ({
+        id,
+        ...value,
+      }));
+
+      return tasks.filter(
+        (task) => task.employees && task.employees.includes(employeeId)
+      );
+    } else {
+      return [];
+    }
   },
   GetAllTasks: async () => {
     const snapshot = await db.ref("tasks").once("value");

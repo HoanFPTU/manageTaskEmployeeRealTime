@@ -21,8 +21,13 @@ const employeeController = {
       if (!email || !accessCode) {
         return res.status(400).json({ message: "Missing data " });
       }
-      await employeeServices.ValidateAccessCode(email, accessCode);
+      const employeeId = await employeeServices.ValidateAccessCode(
+        email,
+        accessCode
+      );
+
       return res.status(201).json({
+        employeeId,
         success: true,
       });
     } catch (error) {

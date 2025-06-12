@@ -5,7 +5,6 @@ const employeeServices = {
     if (!email) {
       throw new Error("Missing Email");
     }
-    const accessCode = Math.floor(100000 + Math.random() * 900000);
     const employee = await db
       .ref("employees")
       .orderByChild("email")
@@ -14,6 +13,8 @@ const employeeServices = {
     if (!employee.exists()) {
       throw new Error("Email does not exist");
     }
+    const accessCode = Math.floor(100000 + Math.random() * 900000);
+    sendMail(email, "Login Access Code", `Your access code is: ${accessCode}`);
     const employeeId = Object.keys(employee.val())[0];
     return await db.ref(`employees/${employeeId}`).update({
       accessCode: accessCode,
@@ -38,9 +39,10 @@ const employeeServices = {
     if (employee.val()[employeeId].accessCode != accessCode) {
       throw new Error("Invalid access code");
     } else {
-      return await db.ref("employees/" + employeeId).update({
+      await db.ref("employees/" + employeeId).update({
         accessCode: "",
       });
+      return employeeId;
     }
   },
   CreateEmployee: async (name, email, department) => {
@@ -69,6 +71,7 @@ const employeeServices = {
 
     return employee;
   },
+
   EditEmployeeById: async (employeeId, department, name) => {
     console.log(employeeId);
     if (!employeeId || !department || !name) {

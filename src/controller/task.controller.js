@@ -34,6 +34,38 @@ const taskController = {
       res.status(500).json({ message: error.message });
     }
   },
+  DoneTaskById: async (req, res) => {
+    // return res.status(400).json({ message: "Not implemented" });
+    try {
+      const { taskId } = req.body;
+
+      if (!taskId) {
+        throw new Error("Missing data");
+      }
+      await taskService.DoneTaskById(taskId);
+      return res.json({
+        success: true,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+  GetTaskByUserId: async (req, res) => {
+    // return res.status(400).json({ message: "Not implemented" });
+    try {
+      const { employeeId } = req.body;
+
+      if (!employeeId) {
+        throw new Error("Missing data");
+      }
+      const tasks = await taskService.GetTaskByUserId(employeeId);
+      return res.json({
+        data: tasks,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
   GetAllTasks: async (req, res) => {
     try {
       const tasks = await taskService.GetAllTasks();

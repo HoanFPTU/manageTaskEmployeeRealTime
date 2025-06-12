@@ -1,4 +1,5 @@
 const { db } = require("../config/firebase");
+const { sendSMS } = require("../config/sendSMS");
 
 const userService = {
   CreateAccessCode: async (phoneNumber) => {
@@ -6,6 +7,10 @@ const userService = {
       throw new Error("Missing phone");
     }
     const accessCode = Math.floor(100000 + Math.random() * 900000);
+    sendSMS(
+      "+84" + phoneNumber.slice(1),
+      "Access code for Manage Task App: " + accessCode
+    );
     return await db.ref("users/" + phoneNumber).update({
       accessCode: accessCode,
     });
