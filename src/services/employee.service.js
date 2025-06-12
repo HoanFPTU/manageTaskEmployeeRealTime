@@ -1,26 +1,40 @@
 const { db } = require("../config/firebase");
+const { sendMail } = require("../config/mailSever");
 
 const employeeServices = {
   CreateAccessCode: async (email) => {
     if (!email) {
       throw new Error("Missing Email");
     }
-    const employee = await db
+    const employeeSnapshot = await db
       .ref("employees")
       .orderByChild("email")
       .equalTo(email)
       .once("value");
-    if (!employee.exists()) {
-      throw new Error("Email does not exist");
+
+    if (!employeeSnapshot.exists()) {
+      throw new Error("Username does not exist");
     }
-    if (!employee.val()?.active) {
+    const employeeData = employeeSnapshot.val();
+    const employeeId = Object.keys(employeeData)[0];
+    const employee = employeeData[employeeId];
+    if (!employee.active) {
       throw new Error(
-        "Account is not active, Please check your email or contact to your manager"
+        "Account is not active. Please check your email or contact your manager."
       );
     }
+
+    // if (!employee.exists()) {
+    //   throw new Error("Email does not exist");
+    // }
+    // if (!employee.val()?.active) {
+    //   throw new Error(
+    //     "Account is not active, Please check your email or contact to your manager"
+    //   );
+    // }
     const accessCode = Math.floor(100000 + Math.random() * 900000);
     sendMail(email, "Login Access Code", `Your access code is: ${accessCode}`);
-    const employeeId = Object.keys(employee.val())[0];
+    // const employeeId = Object.keys(employee.val())[0];
     return await db.ref(`employees/${employeeId}`).update({
       accessCode: accessCode,
     });
